@@ -1,20 +1,22 @@
 import streamlit as st
 from datetime import datetime
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 import gspread
 import pickle
 from pathlib import Path
 import bcrypt
 import pandas as pd
+
 st.set_page_config(layout="wide")
-# Funkcja do załadowania zaszyfrowanych haseł
+
+# Function to load hashed passwords
 def load_hashed_passwords():
     file_path = Path(__file__).parent / "hashed_pw.pkl"
     with file_path.open("rb") as file:
         hashed_passwords = pickle.load(file)
     return hashed_passwords
 
-# Funkcja do weryfikacji hasła
+# Function to verify password
 def verify_password(stored_password, provided_password):
     return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 
@@ -26,7 +28,7 @@ SHEET_NAME_1 = 'ZP dane kont'
 SHEET_NAME_2 = 'ZP status'
 
 # Authenticate and initialize the Google Sheets client
-credentials = ServiceAccountCredentials.from_json_keyfile_name(SERVICE_ACCOUNT_FILE, SCOPES)
+credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 client = gspread.authorize(credentials)
 sheet1 = client.open_by_key(SPREADSHEET_ID).worksheet(SHEET_NAME_1)
 sheet2 = client.open_by_key(SPREADSHEET_ID).worksheet(SHEET_NAME_2)
